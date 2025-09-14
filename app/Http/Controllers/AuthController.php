@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth; 
 
 class AuthController extends Controller
 {
@@ -36,12 +37,13 @@ class AuthController extends Controller
             'hire_date' => $request->hire_date
         ]);
 
-        $token = auth()->login($employee);
+
+        $token = JWTAuth::fromUser($employee);
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            'expires_in' => config('jwt.ttl') * 60, 
             'employee' => $employee
         ], 201);
     }
@@ -50,25 +52,25 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['email', 'password']);
 
-        if (!$token = auth()->attempt($credentials)) {
+        if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => config('jwt.ttl') * 60 
         ]);
     }
 
     public function logout(): JsonResponse
     {
-        auth()->logout();
+        JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json(['message' => 'Successfully logged out']);
     }
 
     public function me(): JsonResponse
     {
-        return response()->json(auth()->user());
+        return response()->json(JWTAuth::user());
     }
 }
