@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: company-api-app
+    container_name: company-api-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - company-api-network
+
+  webserver:
+    image: nginx:alpine
+    container_name: company-api-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - company-api-network
+
+  db:
+    image: mysql:8.0
+    container_name: company-api-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: company_api
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_PASSWORD: secret
+      MYSQL_USER: company_user
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - company-api-network
+
+  redis:
+    image: redis:alpine
+    container_name: company-api-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - company-api-network
+    volumes:
+      - redisdata:/data
+
+volumes:
+  dbdata:
+    driver: local
+  redisdata:
+    driver: local
+
+networks:
+  company-api-network:
+    driver: bridge

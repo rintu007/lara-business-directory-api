@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    volumes:
+      - ./:/var/www
+      - ./docker/php/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+
+  webserver:
+    ports:
+      - "8000:80"
+      - "8001:81" # Optional: for additional services
+
+  db:
+    ports:
+      - "3306:3306"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  # Optional: Add Mailpit for email testing
+  mailpit:
+    image: axllent/mailpit
+    container_name: company-api-mailpit
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    networks:
+      - company-api-network
