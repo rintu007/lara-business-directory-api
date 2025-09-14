@@ -1,4 +1,4 @@
-Your application is now complete! This demonstrates:
+This application is demo for laravel rest API development (Company Directory API). This demonstrates:
 
 ✅ Laravel 12 REST API
 
@@ -9,5 +9,7 @@ Your application is now complete! This demonstrates:
 ✅ Database migrations and models
 
 ✅ Clean, maintainable code structure
+
+✅ Custom Artisan Command
 
 ✅ API testing readiness
